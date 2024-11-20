@@ -5,8 +5,8 @@ import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:serverpod_service_client/serverpod_service_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const tag = 'initializeServerpodClient';
 Future<Client?> initializeServerpodClient(SharedPreferences prefs) async {
-  const tag = 'initializeServerpodClient';
   var host = prefs.getString(Prefs.serverpodServiceServerUrl);
   final key = prefs.getString(Prefs.serverpodServiceServerSecretKey);
   host = (host?.endsWith('/') == false) ? '$host/' : host;
@@ -19,11 +19,15 @@ Future<Client?> initializeServerpodClient(SharedPreferences prefs) async {
   if (host == null || key == null) {
     return null;
   }
-  return Client(
-    host,
-    authenticationKeyManager: MyServiceKeyManager(
-      '0',
-      key,
-    ),
-  )..connectivityMonitor = FlutterConnectivityMonitor();
+  try {
+    return Client(
+      host,
+      authenticationKeyManager: MyServiceKeyManager(
+        '0',
+        key,
+      ),
+    )..connectivityMonitor = FlutterConnectivityMonitor();
+  } catch (e) {
+    return null;
+  }
 }

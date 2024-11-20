@@ -40,13 +40,15 @@ class _LogDetailPageState extends State<LogDetailPage> {
       children: [
         _buildInfo(log),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildEntry(entries),
-              _buildMessage(messages),
-              _buildQueries(queries),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildEntry(entries),
+                _buildMessage(messages),
+                _buildQueries(queries),
+              ],
+            ),
           ),
         )
       ],

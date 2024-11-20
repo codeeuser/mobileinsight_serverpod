@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mobileinsightserverpod/commons/no_data.dart';
 import 'package:mobileinsightserverpod/logger.dart';
 import 'package:mobileinsightserverpod/pages/log_detail_page.dart';
@@ -24,6 +25,7 @@ class WaysPage extends StatefulWidget {
 
 class _WaysPageState extends State<WaysPage> {
   static const String tag = "WaysPage";
+  static const int numEntries = 20;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
@@ -33,6 +35,8 @@ class _WaysPageState extends State<WaysPage> {
   final ValueNotifier<bool> _slow = ValueNotifier(false);
   final ValueNotifier<bool> _error = ValueNotifier(false);
   final ValueNotifier<ScreenName> _screen = ValueNotifier(ScreenName.main);
+
+  String? _endpoint;
 
   @override
   void initState() {
@@ -97,11 +101,16 @@ class _WaysPageState extends State<WaysPage> {
         builder: (context, snapshotClient) {
           if (snapshotClient.hasData) {
             final client = snapshotClient.data;
+            Logger.log(tag, message: 'client: $client');
+            if (client == null) {
+              return const NoData();
+            }
+            Logger.log(tag, message: 'client: ${client.connectionTimeout}');
             return ValueListenableBuilder<SessionLogFilter>(
                 valueListenable: _filter,
                 builder: (context, filter, _) {
                   return FutureBuilder<SessionLogResult>(
-                      future: client?.insights.getSessionLog(null, filter),
+                      future: client.insights.getSessionLog(numEntries, filter),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           final result = snapshot.data;
@@ -150,7 +159,7 @@ class _WaysPageState extends State<WaysPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text('Serverpod Insight'),
+        const Text('Serverpod Insight (MAX:$numEntries)'),
         TextButton(
           child: const Text('Logout'),
           onPressed: () async {
@@ -185,6 +194,7 @@ class _WaysPageState extends State<WaysPage> {
                       label: const Text('Endpoint'),
                       onSelected: (String? endpoint) {
                         endpoint = (endpoint == '') ? null : endpoint;
+                        _endpoint = endpoint;
                         _filter.value = SessionLogFilter(
                             slow: _slow.value,
                             error: _error.value,
@@ -225,7 +235,8 @@ class _WaysPageState extends State<WaysPage> {
                           _filter.value = SessionLogFilter(
                               slow: _slow.value,
                               error: _error.value,
-                              open: _open.value);
+                              open: _open.value,
+                              endpoint: _endpoint);
                         });
                   }),
               const SizedBox(width: 8),
@@ -241,7 +252,8 @@ class _WaysPageState extends State<WaysPage> {
                           _filter.value = SessionLogFilter(
                               slow: _slow.value,
                               error: _error.value,
-                              open: _open.value);
+                              open: _open.value,
+                              endpoint: _endpoint);
                         });
                   }),
               const SizedBox(width: 8),
@@ -257,7 +269,8 @@ class _WaysPageState extends State<WaysPage> {
                           _filter.value = SessionLogFilter(
                               slow: _slow.value,
                               error: _error.value,
-                              open: _open.value);
+                              open: _open.value,
+                              endpoint: _endpoint);
                         });
                   }),
             ],
@@ -294,7 +307,8 @@ class _WaysPageState extends State<WaysPage> {
       children: [
         Text('Server ID: ${log.serverId}'),
         const SizedBox(height: 4),
-        Text('$dt'),
+        Text(
+            '${DateFormat.yMd().format(dt.toLocal())} ${DateFormat.jms().format(dt.toLocal())}'),
         if (duration != null) ...[
           const SizedBox(height: 4),
           Text('$duration'),
