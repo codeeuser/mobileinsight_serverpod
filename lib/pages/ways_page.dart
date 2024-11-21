@@ -183,7 +183,7 @@ class _WaysPageState extends State<WaysPage> {
             }
             final list = [];
             for (var def in defs) {
-              if (def.module == 'serverpod') continue;
+              if (def.module?.startsWith('serverpod') == true) continue;
               list.add((def.dartName ?? '').toUnCapitalized());
             }
             return Padding(
