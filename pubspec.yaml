@@ -28,9 +28,9 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  serverpod_flutter: 2.1.5
-  serverpod_service_client: ^2.1.5
-  serverpod_client: ^2.1.5
+  serverpod_flutter: ^2.6.0
+  serverpod_service_client: ^2.6.0
+  serverpod_client: ^2.6.0
 
 
   # The following adds the Cupertino Icons font to your application.
